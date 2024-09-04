@@ -1,0 +1,15 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+venv/
+.env/
+
+# Misc
+.DS_Store
+
+# Dataset
+dataset/train.csv
+dataset/test.csv
