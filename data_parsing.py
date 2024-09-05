@@ -4,8 +4,10 @@ import csv
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from assembly import Assembly
+if TYPE_CHECKING:
+    from assembly import Assembly
 
 csv.field_size_limit(sys.maxsize)
 

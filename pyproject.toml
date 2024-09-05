@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sunbird"
+version = "0.1.0"
+authors = [
+  { name = "Wyatt Avilla"}
+]
+dependencies = [
+  "requests"
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["CPY", "D", "E501", "PERF203", "S603", "S607", "T20"]
+
