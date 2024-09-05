@@ -51,4 +51,23 @@ class Clang(Compiler):
         super().__init__()
 
     def compile(self, c_code: str) -> str:
-        return c_code + ""
+        try:
+            result = subprocess.run(
+                [
+                    "clang",
+                    "-x",
+                    "c",
+                    "-",
+                    "-S",
+                    "-o",
+                    "-",
+                ],
+                input=c_code.encode("utf-8"),
+                check=True,
+                capture_output=True,
+            )
+            assembly_code = result.stdout.decode("utf-8")
+        except subprocess.CalledProcessError as e:
+            raise CompilationError(e, e.stderr.decode("utf-8")) from e
+
+        return assembly_code
