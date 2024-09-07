@@ -19,6 +19,18 @@ class VersionParseError(Exception):
         return super().__str__()
 
 
+class Assembly:
+    def __init__(
+        self,
+        asm_code: str,
+        compiler: "Compiler",  # forward reference moment
+        optimization_level: int,
+    ) -> None:
+        self.asm_code: str = asm_code
+        self.compiler: Compiler = compiler
+        self.optimization_level: int = optimization_level
+
+
 class Compiler:
     def __init__(self) -> None:
         self.unimplemented_error: str = "Subclasses should implement this"
@@ -26,7 +38,7 @@ class Compiler:
     def get_version(self) -> str:
         raise NotImplementedError(self.unimplemented_error)
 
-    def compile(self, optimization_level: int = 0) -> None:
+    def compile(self, optimization_level: int = 0) -> Assembly:
         raise NotImplementedError(self.unimplemented_error)
 
 
@@ -51,7 +63,7 @@ class GCC(Compiler):
 
         return version.strip()
 
-    def compile(self, c_code: str, optimization_level: int = 0) -> str:
+    def compile(self, c_code: str, optimization_level: int = 0) -> Assembly:
         try:
             result = subprocess.run(
                 [
@@ -72,7 +84,7 @@ class GCC(Compiler):
         except subprocess.CalledProcessError as e:
             raise CompilationError(e, e.stderr.decode("utf-8")) from e
 
-        return assembly_code
+        return Assembly(assembly_code, self, optimization_level)
 
 
 class Clang(Compiler):
@@ -96,7 +108,7 @@ class Clang(Compiler):
 
         return version.splitlines()[0].replace("clang version", "").strip()
 
-    def compile(self, c_code: str, optimization_level: int = 0) -> str:
+    def compile(self, c_code: str, optimization_level: int = 0) -> Assembly:
         try:
             result = subprocess.run(
                 [
@@ -117,4 +129,4 @@ class Clang(Compiler):
         except subprocess.CalledProcessError as e:
             raise CompilationError(e, e.stderr.decode("utf-8")) from e
 
-        return assembly_code
+        return Assembly(assembly_code, self, optimization_level)
