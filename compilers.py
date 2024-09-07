@@ -10,18 +10,46 @@ class CompilationError(Exception):
         return super().__str__()
 
 
+class VersionParseError(Exception):
+    def __init__(self, message: object, console_output: str) -> None:
+        super().__init__(message)
+        self.console_output = console_output
+
+    def __str__(self) -> str:
+        return super().__str__()
+
+
 class Compiler:
     def __init__(self) -> None:
-        pass
+        self.unimplemented_error: str = "Subclasses should implement this"
+
+    def get_version(self) -> str:
+        raise NotImplementedError(self.unimplemented_error)
 
     def compile(self) -> None:
-        msg: str = "Subclasses should implement this"
-        raise NotImplementedError(msg)
+        raise NotImplementedError(self.unimplemented_error)
 
 
 class GCC(Compiler):
     def __init__(self) -> None:
         super().__init__()
+
+    def get_version(self) -> str:
+        try:
+            result = subprocess.run(
+                [
+                    "gcc",
+                    "-dumpfullversion",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            version = result.stdout
+        except subprocess.CalledProcessError as e:
+            raise VersionParseError(e, e.stderr) from e
+
+        return version.strip()
 
     def compile(self, c_code: str) -> str:
         try:
@@ -49,6 +77,23 @@ class GCC(Compiler):
 class Clang(Compiler):
     def __init__(self) -> None:
         super().__init__()
+
+    def get_version(self) -> str:
+        try:
+            result = subprocess.run(
+                [
+                    "clang",
+                    "--version",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            version = result.stdout
+        except subprocess.CalledProcessError as e:
+            raise VersionParseError(e, e.stderr) from e
+
+        return version.splitlines()[0].replace("clang version", "").strip()
 
     def compile(self, c_code: str) -> str:
         try:
