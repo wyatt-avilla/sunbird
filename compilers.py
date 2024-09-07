@@ -26,7 +26,7 @@ class Compiler:
     def get_version(self) -> str:
         raise NotImplementedError(self.unimplemented_error)
 
-    def compile(self) -> None:
+    def compile(self, optimization_level: int = 0) -> None:
         raise NotImplementedError(self.unimplemented_error)
 
 
@@ -51,11 +51,12 @@ class GCC(Compiler):
 
         return version.strip()
 
-    def compile(self, c_code: str) -> str:
+    def compile(self, c_code: str, optimization_level: int = 0) -> str:
         try:
             result = subprocess.run(
                 [
                     "gcc",
+                    f"-O{optimization_level}",
                     "-x",
                     "c",
                     "-",
@@ -95,11 +96,12 @@ class Clang(Compiler):
 
         return version.splitlines()[0].replace("clang version", "").strip()
 
-    def compile(self, c_code: str) -> str:
+    def compile(self, c_code: str, optimization_level: int = 0) -> str:
         try:
             result = subprocess.run(
                 [
                     "clang",
+                    f"-O{optimization_level}",
                     "-x",
                     "c",
                     "-",
