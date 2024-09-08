@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import csv
 import pickle
+import subprocess
 import sys
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+from compilation import C
 
 if TYPE_CHECKING:
     from compilation import Assembly
@@ -19,9 +22,9 @@ class Label(Enum):
 
 
 class DataPoint:
-    def __init__(self, label: Label, c_code: str) -> None:
+    def __init__(self, label: Label, c_code: C) -> None:
         self.label: Label = label
-        self.c_code: str = c_code
+        self.c_code: C = c_code
         self.asm: list[Assembly] = []
 
     def as_dict(self) -> dict[str, str]:
@@ -35,12 +38,28 @@ class DataPoint:
         return col_to_row
 
 
-def clean_code(code: str) -> str:
-    code = code.replace('""', '"')
+def clean_code(csv_line: str) -> str:
+    c_code = csv_line.replace('""', '"')
+    if c_code.startswith('"') and c_code.endswith('"'):
+        c_code = c_code[1:-1]
 
-    if code.startswith('"') and code.endswith('"'):
-        code = code[1:-1]
-    return code
+    result = subprocess.run(
+        [
+            "gcc",
+            "-fpreprocessed",
+            "-dD",
+            "-E",
+            "-P",
+            "-",
+        ],
+        input=c_code.encode("utf-8"),
+        check=True,
+        capture_output=True,
+    )
+    c_code = result.stdout.decode("utf-8")
+    print(c_code)
+    print("-" * 80)
+    return c_code
 
 
 def read_data_csv(input_file: str) -> list[DataPoint]:
@@ -49,7 +68,7 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
         next(reader)  # skip column titles
 
         return [
-            DataPoint(Label(int(label)), clean_code(code)) for code, label in reader
+            DataPoint(Label(int(label)), C(clean_code(code))) for code, label in reader
         ]
 
 

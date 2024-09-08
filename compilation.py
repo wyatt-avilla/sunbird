@@ -19,19 +19,35 @@ class VersionParseError(Exception):
         return super().__str__()
 
 
-class Assembly:
+class Code:
+    def __init__(self, source: str) -> None:  # noqa: ARG002
+        self.unimplemented_error: str = "Subclasses should implement this"
+
+    def __str__(self) -> str:
+        raise NotImplementedError(self.unimplemented_error)
+
+    def as_tokens(self) -> str:
+        raise NotImplementedError(self.unimplemented_error)
+
+
+class C(Code):
+    def __init__(self, source: str) -> None:
+        self.source: str = source
+
+
+class Assembly(Code):
     def __init__(
         self,
-        asm_code: str,
+        source: str,
         compiler: "Compiler",  # forward reference moment
         optimization_level: int,
     ) -> None:
-        self.asm_code: str = asm_code
+        self.source: str = source
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
 
     def __str__(self) -> str:
-        return self.asm_code
+        return self.source
 
 
 class Compiler:
@@ -66,12 +82,14 @@ class GCC(Compiler):
 
         return version.strip()
 
-    def compile(self, c_code: str, optimization_level: int = 0) -> Assembly:
+    def compile(self, c_code: C, optimization_level: int = 0) -> Assembly:
         try:
             result = subprocess.run(
                 [
                     "gcc",
                     f"-O{optimization_level}",
+                    "-fno-verbose-asm",
+                    "-masm=intel",
                     "-x",
                     "c",
                     "-",
@@ -79,7 +97,7 @@ class GCC(Compiler):
                     "-o",
                     "-",
                 ],
-                input=c_code.encode("utf-8"),
+                input=c_code.source.encode("utf-8"),
                 check=True,
                 capture_output=True,
             )
@@ -111,12 +129,14 @@ class Clang(Compiler):
 
         return version.splitlines()[0].replace("clang version", "").strip()
 
-    def compile(self, c_code: str, optimization_level: int = 0) -> Assembly:
+    def compile(self, c_code: C, optimization_level: int = 0) -> Assembly:
         try:
             result = subprocess.run(
                 [
                     "clang",
                     f"-O{optimization_level}",
+                    "-fno-verbose-asm",
+                    "-masm=intel",
                     "-x",
                     "c",
                     "-",
@@ -124,7 +144,7 @@ class Clang(Compiler):
                     "-o",
                     "-",
                 ],
-                input=c_code.encode("utf-8"),
+                input=c_code.source.encode("utf-8"),
                 check=True,
                 capture_output=True,
             )
