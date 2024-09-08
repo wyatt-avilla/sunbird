@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import pickle
 import sys
 from enum import Enum
 from pathlib import Path
@@ -52,13 +53,11 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
         ]
 
 
-def write_data_csv(input_file: str, rows: list[dict[str, str]]) -> None:
-    with Path.open(input_file, mode="w", newline="") as file:
-        writer = csv.DictWriter(
-            file,
-            fieldnames=rows[0].keys(),
-            quoting=csv.QUOTE_MINIMAL,
-        )
+def to_pickle(input_file: str, datapoints: list[DataPoint]) -> None:
+    with Path.open(input_file, "wb") as file:
+        pickle.dump(datapoints, file)
 
-        writer.writeheader()
-        writer.writerows(rows)
+
+def from_pickle(input_file: str) -> list[DataPoint]:
+    with Path.open(input_file, "rb") as file:
+        return pickle.load(file)

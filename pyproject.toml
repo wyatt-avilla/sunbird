@@ -14,5 +14,5 @@ dependencies = [
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["CPY", "D", "E501", "PERF203", "S603", "S607", "T20"]
+ignore = ["CPY", "D", "E501", "PERF203", "S301", "S603", "S607", "T20"]
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from concurrent.futures import Future, ThreadPoolExecutor
 
 from compilation import GCC, Assembly, Clang, CompilationError, Compiler
-from data import DataPoint, read_data_csv, write_data_csv
+from data import DataPoint, read_data_csv, to_pickle
 
 
 def compile_with(
@@ -41,7 +41,5 @@ if __name__ == "__main__":
 
     c_code: list[DataPoint] = read_data_csv(input_csv_name)
     compiled: list[DataPoint] = compile_with(compilers, c_code, optimization_levels)
-    write_data_csv(
-        input_csv_name.replace(".csv", "_compiled.csv"),
-        [datapoint.as_dict() for datapoint in compiled],
-    )
+
+    to_pickle(input_csv_name.replace(".csv", "_compiled.pkl"), compiled)
