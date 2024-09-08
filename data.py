@@ -56,10 +56,7 @@ def clean_code(csv_line: str) -> str:
         check=True,
         capture_output=True,
     )
-    c_code = result.stdout.decode("utf-8")
-    print(c_code)
-    print("-" * 80)
-    return c_code
+    return result.stdout.decode("utf-8")
 
 
 def read_data_csv(input_file: str) -> list[DataPoint]:
