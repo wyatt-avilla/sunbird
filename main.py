@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
 
-from compilers import GCC, Assembly, Clang, CompilationError, Compiler
-from data_parsing import DataPoint, read_data_csv
+from compilation import GCC, Assembly, Clang, CompilationError, Compiler
+from data import DataPoint, read_data_csv, write_data_csv
 
 
 def compile_with(
@@ -37,6 +37,5 @@ def compile_with(
 if __name__ == "__main__":
     parsed: list[DataPoint] = read_data_csv("dataset/sample.csv")
     compiled: list[DataPoint] = compile_with([GCC(), Clang()], parsed, [0, 1, 2, 3])
-
-    print(len(compiled))
-    print(f"{len(parsed) - len(compiled)} failed compilations")
+    rows: list[dict[str, str]] = [datapoint.as_dict() for datapoint in compiled]
+    write_data_csv("dataset/test_generated.csv", rows)

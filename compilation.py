@@ -30,6 +30,9 @@ class Assembly:
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
 
+    def __str__(self) -> str:
+        return self.asm_code
+
 
 class Compiler:
     def __init__(self) -> None:
