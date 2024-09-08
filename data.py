@@ -28,7 +28,7 @@ class DataPoint:
         for asm in self.asm:
             compiler_version: str = asm.compiler.get_version()
             optimization_lvel: int = asm.optimization_level
-            key: str = f"{asm.compiler.__class__.__name__}_{compiler_version}_0{optimization_lvel}"
+            key: str = f"{asm.compiler.__class__.__name__}_{compiler_version}_O{optimization_lvel}"
             col_to_row[key] = asm
 
         return col_to_row
