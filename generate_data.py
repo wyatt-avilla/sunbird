@@ -35,7 +35,13 @@ def compile_with(
 
 
 if __name__ == "__main__":
-    parsed: list[DataPoint] = read_data_csv("dataset/sample.csv")
-    compiled: list[DataPoint] = compile_with([GCC(), Clang()], parsed, [0, 1, 2, 3])
-    rows: list[dict[str, str]] = [datapoint.as_dict() for datapoint in compiled]
-    write_data_csv("dataset/test_generated.csv", rows)
+    input_csv_name: str = "dataset/sample.csv"
+    compilers: list[Compiler] = [GCC(), Clang()]
+    optimization_levels: list[int] = [0, 1, 2, 3]
+
+    c_code: list[DataPoint] = read_data_csv(input_csv_name)
+    compiled: list[DataPoint] = compile_with(compilers, c_code, optimization_levels)
+    write_data_csv(
+        input_csv_name.replace(".csv", "_compiled.csv"),
+        [datapoint.as_dict() for datapoint in compiled],
+    )
