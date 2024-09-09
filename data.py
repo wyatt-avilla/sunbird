@@ -4,6 +4,7 @@ import csv
 import pickle
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -42,8 +43,7 @@ def clean_code(csv_line: str) -> str:
     c_code = csv_line.replace('""', '"')
     if c_code.startswith('"') and c_code.endswith('"'):
         c_code = c_code[1:-1]
-
-    result = subprocess.run(
+    return subprocess.run(
         [
             "gcc",
             "-fpreprocessed",
@@ -55,8 +55,15 @@ def clean_code(csv_line: str) -> str:
         input=c_code.encode("utf-8"),
         check=True,
         capture_output=True,
-    )
-    return result.stdout.decode("utf-8")
+    ).stdout.decode("utf-8")
+
+
+def process_row(row: list[str]) -> DataPoint:
+    code, label = row
+    try:
+        return DataPoint(Label(int(label)), C(clean_code(code)))
+    except subprocess.CalledProcessError:
+        return None
 
 
 def read_data_csv(input_file: str) -> list[DataPoint]:
@@ -64,9 +71,10 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
         reader = csv.reader(f)
         next(reader)  # skip column titles
 
-        return [
-            DataPoint(Label(int(label)), C(clean_code(code))) for code, label in reader
-        ]
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(process_row, reader))
+
+    return [dp for dp in results if dp is not None]
 
 
 def to_pickle(input_file: str, datapoints: list[DataPoint]) -> None:

@@ -24,10 +24,7 @@ class Code:
         self.unimplemented_error: str = "Subclasses should implement this"
 
     def __str__(self) -> str:
-        raise NotImplementedError(self.unimplemented_error)
-
-    def as_tokens(self) -> str:
-        raise NotImplementedError(self.unimplemented_error)
+        return self.source
 
 
 class C(Code):
@@ -45,9 +42,6 @@ class Assembly(Code):
         self.source: str = source
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
-
-    def __str__(self) -> str:
-        return self.source
 
 
 class Compiler:
