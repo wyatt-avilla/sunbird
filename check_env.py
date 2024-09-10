@@ -46,7 +46,7 @@ def get_installed_packages() -> set[str]:
 
 
 def check_requirements(requirements_file: str = "reqs.txt") -> None:
-    with Path.open(requirements_file, "r") as file:
+    with Path(requirements_file).open("r") as file:
         requirements = file.read().splitlines()
 
     required_packages = {

@@ -3,8 +3,8 @@ from __future__ import annotations
 import subprocess
 from typing import Generator
 
-from tree_sitter import Node, Parser, Tree
-from tree_sitter_language_pack import get_language
+from tree_sitter import Parser, Tree
+from tree_sitter_language_pack import SupportedLanguage, get_language
 
 
 class CompilationError(Exception):
@@ -26,13 +26,15 @@ class VersionParseError(Exception):
 
 
 class Code:
-    def __init__(self, source: str) -> None:  # noqa: ARG002
+    def __init__(self, source: str) -> None:
         self.unimplemented_error: str = "Subclasses should implement this"
+        self.source: str = source
+        self.ts_language: SupportedLanguage = None  # type: ignore[assignment]
 
     def __str__(self) -> str:
         return self.source
 
-    def as_tokens(self) -> Generator[Node, None, None]:
+    def as_tokens(self) -> Generator[tuple[str, str], None, None]:
         parser: Parser = Parser()
         parser.language = get_language(self.ts_language)
         tree: Tree = parser.parse(self.source.encode("utf-8"))
@@ -40,9 +42,12 @@ class Code:
 
         visited_children = False
         while True:
+            if (node := cursor.node) is None:
+                break
+
             if not visited_children:
-                if cursor.node.child_count == 0:
-                    yield (cursor.node.type, cursor.node.text.decode("utf-8"))
+                if node.child_count == 0 and node.text is not None:
+                    yield (node.type, node.text.decode("utf-8"))
                 if not cursor.goto_first_child():
                     visited_children = True
             elif cursor.goto_next_sibling():
@@ -53,8 +58,8 @@ class Code:
 
 class C(Code):
     def __init__(self, source: str) -> None:
-        self.source: str = source
-        self.ts_language: str = "c"
+        super().__init__(source)
+        self.ts_language: SupportedLanguage = "c"
 
 
 class Assembly(Code):
@@ -64,8 +69,8 @@ class Assembly(Code):
         compiler: Compiler,
         optimization_level: int,
     ) -> None:
-        self.source: str = source
-        self.ts_language: str = "asm"
+        super().__init__(source)
+        self.ts_language: SupportedLanguage = "asm"
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
 
@@ -77,7 +82,7 @@ class Compiler:
     def get_version(self) -> str:
         raise NotImplementedError(self.unimplemented_error)
 
-    def compile(self, optimization_level: int = 0) -> Assembly:
+    def compile(self, c_code: C, optimization_level: int = 0) -> Assembly:
         raise NotImplementedError(self.unimplemented_error)
 
 

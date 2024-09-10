@@ -12,9 +12,9 @@ from data import DataPoint, read_data_csv
 
 
 def compile_with(
-    compilers: list[Compiler],
+    compilers: tuple[Compiler, ...],
     datapoints: list[DataPoint],
-    optimization_levels: list[int],
+    optimization_levels: tuple[int, ...],
 ) -> list[DataPoint]:
     compiled: set[DataPoint] = set()
 
@@ -40,9 +40,11 @@ def compile_with(
 
 
 def openable(f_name: str) -> bool:
+    opened: bool = False
     try:
-        with Path.open(f_name, "r") as _:
-            return True
+        with Path(f_name).open("r") as _:
+            pass
+        opened = True
     except FileNotFoundError:
         print(f"{f_name} does not exist")
     except PermissionError:
@@ -52,19 +54,19 @@ def openable(f_name: str) -> bool:
     except OSError as e:
         print("an unexpected OS error occurred")
         print(e)
-    else:
-        return False
+
+    return opened
 
 
 def csv_to_pickle_compile(
     input_csv_name: str,
-    compilers: tuple[Compiler] = (GCC(), Clang()),
-    optimization_levels: tuple[int] = (0, 1, 2, 3),
+    compilers: tuple[Compiler, ...] = (GCC(), Clang()),
+    optimization_levels: tuple[int, ...] = (0, 1, 2, 3),
 ) -> None:
     c_code: list[DataPoint] = read_data_csv(input_csv_name)
     compiled: list[DataPoint] = compile_with(compilers, c_code, optimization_levels)
 
-    with Path.open(input_csv_name.replace(".csv", "_compiled.pkl"), "wb") as file:
+    with Path(input_csv_name.replace(".csv", "_compiled.pkl")).open("wb") as file:
         pickle.dump(compiled, file)
 
 

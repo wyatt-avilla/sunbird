@@ -29,12 +29,12 @@ class DataPoint:
         self.asm: list[Assembly] = []
 
     def as_dict(self) -> dict[str, str]:
-        col_to_row: dict[str, str] = {"c_code": self.c_code}
+        col_to_row: dict[str, str] = {"c_code": self.c_code.source}
         for asm in self.asm:
             compiler_version: str = asm.compiler.get_version()
             optimization_lvel: int = asm.optimization_level
             key: str = f"{asm.compiler.__class__.__name__}_{compiler_version}_O{optimization_lvel}"
-            col_to_row[key] = asm
+            col_to_row[key] = asm.source
 
         return col_to_row
 
@@ -58,7 +58,7 @@ def clean_code(csv_line: str) -> str:
     ).stdout.decode("utf-8")
 
 
-def process_row(row: list[str]) -> DataPoint:
+def process_row(row: list[str]) -> DataPoint | None:
     code, label = row
     try:
         return DataPoint(Label(int(label)), C(clean_code(code)))
@@ -67,7 +67,7 @@ def process_row(row: list[str]) -> DataPoint:
 
 
 def read_data_csv(input_file: str) -> list[DataPoint]:
-    with Path.open(input_file, mode="r", newline="", encoding="utf-8") as f:
+    with Path(input_file).open(mode="r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
         next(reader)  # skip column titles
 
@@ -78,5 +78,5 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
 
 
 def from_pickle(input_file: str) -> list[DataPoint]:
-    with Path.open(input_file, "rb") as file:
+    with Path(input_file).open("rb") as file:
         return list(pickle.load(file))
