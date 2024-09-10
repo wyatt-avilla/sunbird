@@ -31,7 +31,7 @@ def compile_with(
             print(f"Console Output: {e.console_output}")
             continue
 
-    return compiled
+    return list(compiled)
 
 
 if __name__ == "__main__":
