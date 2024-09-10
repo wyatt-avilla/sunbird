@@ -1,4 +1,10 @@
+from __future__ import annotations
+
 import subprocess
+from typing import Generator
+
+from tree_sitter import Node, Parser
+from tree_sitter_language_pack import get_language
 
 
 class CompilationError(Exception):
@@ -26,22 +32,42 @@ class Code:
     def __str__(self) -> str:
         return self.source
 
+    def as_tokens(self) -> Generator[Node, None, None]:
+        tree = self.parser.parse(self.source.encode("utf-8"))
+        cursor = tree.walk()
+
+        visited_children = False
+        while True:
+            if not visited_children:
+                if cursor.node.child_count == 0:
+                    yield (cursor.node.type, cursor.node.text.decode("utf-8"))
+                if not cursor.goto_first_child():
+                    visited_children = True
+            elif cursor.goto_next_sibling():
+                visited_children = False
+            elif not cursor.goto_parent():
+                break
+
 
 class C(Code):
     def __init__(self, source: str) -> None:
         self.source: str = source
+        self.parser: Parser = Parser()
+        self.parser.language = get_language("c")
 
 
 class Assembly(Code):
     def __init__(
         self,
         source: str,
-        compiler: "Compiler",  # forward reference moment
+        compiler: Compiler,
         optimization_level: int,
     ) -> None:
         self.source: str = source
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
+        self.parser: Parser = Parser()
+        self.parser.language = get_language("asm")
 
 
 class Compiler:
