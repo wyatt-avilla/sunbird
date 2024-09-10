@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from typing import Generator
 
-from tree_sitter import Node, Parser
+from tree_sitter import Node, Parser, Tree
 from tree_sitter_language_pack import get_language
 
 
@@ -33,7 +33,9 @@ class Code:
         return self.source
 
     def as_tokens(self) -> Generator[Node, None, None]:
-        tree = self.parser.parse(self.source.encode("utf-8"))
+        parser: Parser = Parser()
+        parser.language = get_language(self.ts_language)
+        tree: Tree = parser.parse(self.source.encode("utf-8"))
         cursor = tree.walk()
 
         visited_children = False
@@ -52,8 +54,7 @@ class Code:
 class C(Code):
     def __init__(self, source: str) -> None:
         self.source: str = source
-        self.parser: Parser = Parser()
-        self.parser.language = get_language("c")
+        self.ts_language: str = "c"
 
 
 class Assembly(Code):
@@ -64,10 +65,9 @@ class Assembly(Code):
         optimization_level: int,
     ) -> None:
         self.source: str = source
+        self.ts_language: str = "asm"
         self.compiler: Compiler = compiler
         self.optimization_level: int = optimization_level
-        self.parser: Parser = Parser()
-        self.parser.language = get_language("asm")
 
 
 class Compiler:
