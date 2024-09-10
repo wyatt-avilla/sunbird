@@ -32,7 +32,7 @@ def compile_with(
             datapoint.asm.append(assembly_code)
             compiled.add(datapoint)
         except CompilationError as e:
-            print(f"Failed to build: {"*"*70} \n\n{datapoint.c_code}\n\n")
+            print(f"Failed to build: {'*'*70} \n\n{datapoint.c_code}\n\n")
             print(f"Console Output: {e.console_output}")
             continue
 
