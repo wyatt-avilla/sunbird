@@ -9,7 +9,15 @@ authors = [
   { name = "Wyatt Avilla"}
 ]
 dependencies = [
-  "requests"
+  "kaggle==1.6.17",
+  "tree-sitter==0.23.0",
+  "tree-sitter-language-pack==0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pre-commit==3.8.0",
+  "ruff==0.6.3",
 ]
 
 [tool.ruff.lint]
