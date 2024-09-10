@@ -84,4 +84,4 @@ def to_pickle(input_file: str, datapoints: list[DataPoint]) -> None:
 
 def from_pickle(input_file: str) -> list[DataPoint]:
     with Path.open(input_file, "rb") as file:
-        return pickle.load(file)
+        return list(pickle.load(file))
