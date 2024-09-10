@@ -77,11 +77,6 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
     return [dp for dp in results if dp is not None]
 
 
-def to_pickle(input_file: str, datapoints: list[DataPoint]) -> None:
-    with Path.open(input_file, "wb") as file:
-        pickle.dump(datapoints, file)
-
-
 def from_pickle(input_file: str) -> list[DataPoint]:
     with Path.open(input_file, "rb") as file:
         return list(pickle.load(file))
