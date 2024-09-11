@@ -12,6 +12,9 @@ dependencies = [
   "kaggle==1.6.17",
   "tree-sitter==0.23.0",
   "tree-sitter-language-pack==0.2.0",
+  "notebook==7.2.2",
+  "torch==2.4.1",
+  "numpy==2.1.1",
 ]
 
 [project.optional-dependencies]
