@@ -2,7 +2,7 @@ name: Ruff
 on: push
 jobs:
   lint:
-    name: Lint Source Code
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -13,13 +13,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Lint Python source files
+      - name: Lint files
         run: ruff check --output-format=github .
-      - name: Lint Jupyter Notebooks
-        run: nbqa ruff --output-format=github *.ipynb
 
   format:
-    name: Check Source Formatting
+    name: Check Formatting
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -33,19 +31,3 @@ jobs:
 
       - name: Check Formatting for Python source files
         run: ruff format --check .
-
-  nbqa:
-    name: Ruff NBQA
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python environment
-        uses: ./.github/actions/setup-python
-        with:
-          python-version: "3.11"
-
-      - name: Run ruff on Jupyter Notebooks
-        run: nbqa ruff *.ipynb

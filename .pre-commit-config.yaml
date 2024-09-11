@@ -1,19 +1,14 @@
 repos:
   - repo: local
     hooks:
-    - id: ruff_lint_src
-      name: Linting source files with ruff
-      entry: sh -c "ruff check *.py"
+    - id: ruff_lint
+      name: Linting with ruff
+      entry: sh -c "ruff check ."
       language: system
 
-    - id: ruff_format_src
-      name: Checking formatting of source files with ruff
-      entry: sh -c "ruff format --check *.py"
-      language: system
-
-    - id: ruff_nb
-      name: Linting notebooks with ruff
-      entry: sh -c "nbqa ruff *.ipynb"
+    - id: ruff_format
+      name: Checking formatting with ruff
+      entry: sh -c "ruff format --check ."
       language: system
 
     - id: mypy_nb
