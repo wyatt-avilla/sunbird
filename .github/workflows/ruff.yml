@@ -33,7 +33,6 @@ jobs:
 
       - name: Check Formatting for Python source files
         run: ruff format --check .
-      - name: Check Formatting for Jupyter Notebooks
 
   nbqa:
     name: Ruff NBQA
