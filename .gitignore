@@ -3,6 +3,7 @@
 *.pyo
 __pycache__/
 sunbird.egg-info/
+.ipynb_checkpoints/
 
 # Virtual environment
 venv/

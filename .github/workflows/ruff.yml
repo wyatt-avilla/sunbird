@@ -16,7 +16,7 @@ jobs:
       - name: Lint Python source files
         run: ruff check --output-format=github .
       - name: Lint Jupyter Notebooks
-        run: nbqa ruff check --output-format=github *.ipynb
+        run: nbqa ruff --output-format=github *.ipynb
 
   format:
     name: Check Source Formatting
