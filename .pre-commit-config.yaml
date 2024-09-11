@@ -1,9 +1,31 @@
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.6.3
+  - repo: local
     hooks:
-      # Run the linter.
-      - id: ruff
-      # Run the formatter.
-      - id: ruff-format
+    - id: ruff_lint_src
+      name: Linting source files with ruff
+      entry: sh -c "ruff check *.py"
+      language: system
+
+    - id: ruff_format_src
+      name: Checking formatting of source files with ruff
+      entry: sh -c "ruff format --check *.py"
+      language: system
+
+    - id: ruff_nb
+      name: Linting notebooks with ruff
+      entry: sh -c "nbqa ruff *.ipynb"
+      language: system
+
+    - id: mypy_nb
+      additional_dependencies: [tree-sitter==0.23.0]
+      name: Type checking notebooks with mypy
+      entry: nbqa mypy
+      language: python
+
+  -   repo: https://github.com/pre-commit/mirrors-mypy
+      rev: 'v1.11.2'
+      hooks:
+      - id: mypy
+        additional_dependencies: [tree-sitter==0.23.0, tree-sitter-language-pack==0.2.0]
+        args: [--strict]
+

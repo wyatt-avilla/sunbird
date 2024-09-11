@@ -13,5 +13,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run mypy
+      - name: Run mypy on Python source files
         run: mypy .
+      - name: Run mypy on Jupyter Notebooks
+        run: nbqa mypy *.ipynb

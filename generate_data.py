@@ -19,7 +19,7 @@ def compile_with(
     compiled: set[DataPoint] = set()
 
     with ThreadPoolExecutor() as executor:
-        futures: list[tuple[DataPoint, Future]] = [
+        futures: list[tuple[DataPoint, Future[Assembly]]] = [
             (datapoint, executor.submit(compiler.compile, datapoint.c_code, opt_level))
             for datapoint in datapoints
             for compiler in compilers

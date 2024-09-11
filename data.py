@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import csv
-import pickle
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -75,8 +74,3 @@ def read_data_csv(input_file: str) -> list[DataPoint]:
             results = list(executor.map(process_row, reader))
 
     return [dp for dp in results if dp is not None]
-
-
-def from_pickle(input_file: str) -> list[DataPoint]:
-    with Path(input_file).open("rb") as file:
-        return list(pickle.load(file))
