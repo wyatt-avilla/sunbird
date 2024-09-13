@@ -1,28 +1,24 @@
 repos:
-  - repo: local
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.9.0
     hooks:
-    - id: ruff_lint
-      name: Linting with ruff
-      entry: sh -c "ruff check ."
-      language: system
+      - id: nbqa-mypy
+        additional_dependencies: [tree-sitter==0.23.0, tree-sitter-language-pack==0.2.0, mypy==1.11.2, torch==2.4.1, types-tqdm==4.66.0.20240417]
+        args: ["--strict"]
 
-    - id: ruff_format
-      name: Checking formatting with ruff
-      entry: sh -c "ruff format --check ."
-      language: system
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.5
+    hooks:
+      - id: ruff
+      - id: ruff-format
 
-    - id: mypy_nb
-      additional_dependencies: [tree-sitter==0.23.0]
-      name: Type checking notebooks with mypy
-      entry: nbqa mypy
-      language: python
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.11.2'
+    hooks:
+    - id: mypy
+      additional_dependencies: [tree-sitter==0.23.0, tree-sitter-language-pack==0.2.0]
+      args: [--strict]
 
-  -   repo: https://github.com/pre-commit/mirrors-mypy
-      rev: 'v1.11.2'
-      hooks:
-      - id: mypy
-        additional_dependencies: [tree-sitter==0.23.0, tree-sitter-language-pack==0.2.0]
-        args: [--strict]
   - repo: https://github.com/kynan/nbstripout
     rev: 0.5.0
     hooks:
