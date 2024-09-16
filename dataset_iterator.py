@@ -113,6 +113,3 @@ class DatasetIterator:
                 taken.extend(compiled)
 
         return taken
-
-
-dataset = DatasetIterator("dataset/train.csv")

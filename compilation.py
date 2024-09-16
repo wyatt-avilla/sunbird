@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import subprocess
-from typing import Generator
+from typing import TYPE_CHECKING
 
-from tree_sitter import Parser, Tree
-from tree_sitter_language_pack import SupportedLanguage, get_language
+if TYPE_CHECKING:
+    from tree_sitter_language_pack import SupportedLanguage
 
 
 class CompilationError(Exception):
@@ -33,27 +33,6 @@ class Code:
 
     def __str__(self) -> str:
         return self.source
-
-    def as_tokens(self) -> Generator[tuple[str, str], None, None]:
-        parser: Parser = Parser()
-        parser.language = get_language(self.ts_language)
-        tree: Tree = parser.parse(self.source.encode("utf-8"))
-        cursor = tree.walk()
-
-        visited_children = False
-        while True:
-            if (node := cursor.node) is None:
-                break
-
-            if not visited_children:
-                if node.child_count == 0 and node.text is not None:
-                    yield (node.type, node.text.decode("utf-8"))
-                if not cursor.goto_first_child():
-                    visited_children = True
-            elif cursor.goto_next_sibling():
-                visited_children = False
-            elif not cursor.goto_parent():
-                break
 
 
 class C(Code):
