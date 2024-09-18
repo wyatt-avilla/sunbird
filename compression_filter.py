@@ -40,33 +40,39 @@ class CompressionFilter:
         results = []
 
         ignore_types: set[str] = {"meta_ident", "ERROR"}
+
         asm_to_c_types: dict[str, str] = {
             "int": "number_literal",
             "string": "string_content",
         }
-        simplification_map: dict[str, dict[str, str]] = {
-            "identifier": defaultdict(
-                lambda: f"identifier_{len(simplification_map['identifier'])}",
-            ),
-            "number_literal": defaultdict(
-                lambda: f"number_literal_{len(simplification_map['number_literal'])}",
-            ),
-            "string_content": defaultdict(
-                lambda: f"string_content_{len(simplification_map['string_content'])}",
-            ),
+
+        simplification_types = {
+            "identifier",
+            "number_literal",
+            "string_content",
+            "ident",
+            "word",
+        }
+
+        def create_default_dict(key: str) -> defaultdict[str, str]:
+            return defaultdict(lambda: f"{key}_{len(simplification_map[key])}")
+
+        simplification_map = {
+            simplification_type: create_default_dict(simplification_type)
+            for simplification_type in simplification_types
         }
 
         compressed_c_tokens: list[tuple[str, str]] = [
             (typ, simplification_map[typ][txt])
-            if typ in simplification_map
+            if typ in simplification_types
             else (typ, txt)
             for (typ, txt) in self.__ast_leaf_iterator(self.dp.c_code)
         ]
 
         for asm in self.dp.asm:
             compressed_asm_tokens = [
-                (typ, simplification_map[asm_to_c_types[typ]][txt])
-                if typ in asm_to_c_types
+                (typ, simplification_map[asm_to_c_types.get(typ, typ)][txt])
+                if asm_to_c_types.get(typ, typ) in simplification_types
                 else (typ, txt)
                 for (typ, txt) in self.__ast_leaf_iterator(asm)
             ]
