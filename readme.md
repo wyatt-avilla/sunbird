@@ -17,9 +17,9 @@ resulting assembly code is tokenized for use in training.
 
 - the model was trained on an augmented version of
   [this dataset](https://www.kaggle.com/datasets/shirshaka/c-code-snippets-and-their-labels)
-- each snippet of C code was compiled with the first four optimization levels of
-  GCC and Clang, yielding 8 unique assembly code snippets for each element in
-  the initial dataset (totaling 2.5 million snippets)
+- each snippet of C code is compiled (by default) with the first four
+  optimization levels of GCC and Clang, yielding 8 unique assembly code snippets
+  for each element in the initial dataset (totaling 2.5 million snippets)
 
 If `kaggle` is in your path, the original dataset can be downloaded with:
 
@@ -30,20 +30,11 @@ unzip -d dataset c-code-snippets-and-their-labels.zip
 
 ### Generation
 
-- compilation settings, including optimization levels and compiler choices are
-  specified in `generate_data.py`
+- compilation is performed as needed when calling `DatasetIterator.take(n)`
+  - compilation settings, including optimization levels and compiler choices are
+    specified in the arguments to this method call
 - the exact flags passed into the compilation subprocesses are specified in the
   `.compile()` methods in `compilation.py`
-
-Compilation can be performed as follows:
-
-```sh
-./generate_data.py <filename.csv>
-```
-
-This will write a serialized list of `DataPoint` classes to
-`filename_compiled.pkl`. Each `DataPoint` contains the original C code, its
-corresponding assembly snippets, and associated metadata.
 
 ## Tokenization
 
